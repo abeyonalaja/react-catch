@@ -34,6 +34,30 @@ var App = React.createClass({
 
 
 /*
+  Add Fish Form
+*/
+
+var AddFishForm = React.createClass({
+
+  render : function () {
+    return (
+      <form  className="fish-edit" onSubmit="{this.createFish.bind(this)}">
+        <input ref="name" placeholder="Fish Name" type="text" /> 
+        <input ref="price" placeholder="Fish Price" type="text" /> 
+        <select ref="status">
+          <option value="available">Fresh!</option>
+          <option value="unavailable">Sold Out!</option>
+        </select>
+        <textarea cols="30" id="" name="" rows="10" ref="desc" placeholder="Desc"></textarea>
+        <input ref="image" placeholder="URL to Image" type="text" /> 
+        <button type="submit">+ Add Item</button>
+      </form>
+    )
+  }
+
+});
+
+/*
 
   Header
 
@@ -83,7 +107,10 @@ var Inventory = React.createClass({
 
   render : function () {
     return (
-        <p>Inventory</p>
+      <div>
+        <h2>Inventory</h2>
+        <AddFishForm />
+      </div>
     )
   }
 
