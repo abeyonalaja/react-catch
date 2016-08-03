@@ -22,7 +22,7 @@ var App = React.createClass({
     return {
       fishes : {},
       order : {}
-    }
+    };
   },
 
   addFish : function (fish) {
@@ -33,6 +33,12 @@ var App = React.createClass({
 
   },
 
+  loadSamples : function() {
+    this.setState({
+      fishes : require('./sample-fishes')
+    });
+  },
+
   render : function () {
     return (
       <div className="catch-of-the-day">
@@ -40,9 +46,9 @@ var App = React.createClass({
           <Header  tagline="Fresh Seafood Market" />
         </div>
         <Order />
-        <Inventory addFish={this.addFish}/>
+        <Inventory addFish={this.addFish} loadSamples={this.loadSamples}/>
       </div>
-    )
+    );
   }
 
 });
@@ -83,7 +89,7 @@ var AddFishForm = React.createClass({
         <input ref="image" placeholder="URL to Image" type="text" /> 
         <button type="submit">+ Add Item</button>
       </form>
-    )
+    );
   }
 
 });
@@ -107,7 +113,7 @@ var Header = React.createClass({
         Day</h1>
         <h3 className="tagline"><span>{this.props.tagline}</span></h3>
       </header>
-    )
+    );
     
   }
 
@@ -124,9 +130,11 @@ var Order = React.createClass({
   render : function () {
     return (
         <p>Order</p>
-    )
+    );
+
   }
-})
+
+});
 
 
 /*
@@ -141,6 +149,7 @@ var Inventory = React.createClass({
       <div>
         <h2>Inventory</h2>
         <AddFishForm {...this.props} />
+        <button onClick={this.props.loadSamples}>Load Samples</button>
       </div>
     )
   }
@@ -156,7 +165,7 @@ var StorePicker = React.createClass({
     event.preventDefault();
 
     var storeId = this.refs.storeId.value;
-    this.history.pushState(null, '/store/' + storeId)
+    this.history.pushState(null, '/store/' + storeId);
   },
 
   render : function () {
@@ -166,7 +175,7 @@ var StorePicker = React.createClass({
         <input type="text" ref="storeId" defaultValue={ h.getFunName() } required />
         <input type="submit" />
       </form>
-    )
+    );
   }
 
 });
