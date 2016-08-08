@@ -1,5 +1,6 @@
 var React = require ( 'react' );
 var ReactDOM = require('react-dom');
+var CSSTransitionGroup = require('react-addons-css-transition-group');
 
 var ReactRouter = require('react-router');
 var Router = ReactRouter.Router;
@@ -16,6 +17,12 @@ var Rebase = require('re-base');
 var base = Rebase.createClass('https://luminous-heat-722.firebaseio.com/');
 
 var Catalyst = require('react-catalyst');
+
+/*
+ Import Componets
+ */
+import NotFound from './components/NotFound';
+import StorePicker from './components/StorePicker';
 
 
 /*
@@ -65,6 +72,22 @@ var App = React.createClass({
 
   },
 
+  removeFromOrder : function(key) {
+    delete this.state.order[key];
+    this.setState({
+      order: this.state.order
+    });
+  },
+
+  removeFish : function (key){
+    if( confirm( "Are you sure you want to remove this fish?") ) {
+
+      this.state.fishes[key] = null;
+      this.setState( { fishes : this.state.fishes } );
+
+    }
+  },
+
   loadSamples : function() {
     this.setState({
       fishes : require('./sample-fishes')
@@ -85,10 +108,14 @@ var App = React.createClass({
             {Object.keys(this.state.fishes).map(this.renderFish)}
           </ul>
         </div>
-        <Order order={this.state.order} fishes={this.state.fishes} />
+        <Order
+           order={ this.state.order }
+           fishes={ this.state.fishes }
+           removeFromOrder={ this.removeFromOrder }/>
         <Inventory
            fishes={this.state.fishes}
            addFish={this.addFish}
+           removeFish={this.removeFish}
            linkState={this.linkState}
            loadSamples={this.loadSamples}/>
       </div>
@@ -207,9 +234,10 @@ var Order = React.createClass({
 
     var fish = this.props.fishes[key];
     var count = this.props.order[key];
+    var removeButton = < button onClick={this.props.removeFromOrder.bind(null, key ) } > &times; </button>;
     
     if(!fish){
-      return <li key={key}> Sorry, fish no longer available! </li>;
+      return <li key={key}> Sorry, fish no longer available! { removeButton } </li>;
     }
 
     return (
@@ -217,6 +245,7 @@ var Order = React.createClass({
         { count }lbs
         { fish.name }
         <span className="price">{ h.formatPrice( count * fish.price ) }</span>
+        { removeButton }
       </li>
     );
 
@@ -239,14 +268,20 @@ var Order = React.createClass({
     return (
       <div className="order-wrap">
         <h2 className="order-title">Your Order</h2>
-        <ul className="order">
+        
+        <CSSTransitionGroup
+           component="ul"
+           className="order"
+           transitionEnterTimeout={500}
+           transitionLeaveTimeout={500}
+           transitionName="order" >
           { orderIds.map( this.renderOrder ) }
           <li className="total">
             <strong>Total:</strong>
             { h.formatPrice( total ) }
           </li>
 
-        </ul>
+        </CSSTransitionGroup>
       </div>
     );
 
@@ -277,7 +312,7 @@ var Inventory = React.createClass({
 
         <textarea valueLink={linkState('fishes.' + key + '.desc')}></textarea>
         <input name="" type="text" valueLink={ linkState('fishes.'+ key +'.image')} />
-        <button>Remove Fish</button>
+        <button onClick={this.props.removeFish.bind(null, key)}>Remove Fish</button>
       </div>
     );
   },
@@ -295,42 +330,6 @@ var Inventory = React.createClass({
 
 });
 
-                               
-var StorePicker = React.createClass({
-
-  mixins: [History],
-
-  goToStore : function (event) {
-    event.preventDefault();
-
-    var storeId = this.refs.storeId.value;
-    this.history.pushState(null, '/store/' + storeId);
-  },
-
-  render : function () {
-    return (
-        <form className="store-selector" onSubmit={this.goToStore}>
-        <h2>Please Enter A Store</h2>
-        <input type="text" ref="storeId" defaultValue={ h.getFunName() } required />
-        <input type="submit" />
-      </form>
-    );
-  }
-
-});
-
-
-/*
-  Not Found
-*/
-
-var NotFound = React.createClass({
-
-  render : function() {
-    return <h1>Not Found!</h1>
-  }
-
-});
 
 /*
   Routes
